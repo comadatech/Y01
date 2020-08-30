@@ -1,0 +1,17 @@
+- Authenticate using facebook...
+- Implementing Captcha in registration
+- Send a confirmation email
+- Add account confirmation page from email.
+- Add more validation on registration and in profile.
+- Create a message box with style and icon and color using ajax.
+- Ensure that everywhere there are no SQL Injection
+- Investigate if need to add salt in password hash
+- send to a error page when $conn is in error. Instead or a message and a DIE.
+- on index.php, there should be no session work on this page,
+    since it should only start on validatelogin.php
+- Rename page index.php to login.php
+- if person already login, cannot register again
+- disable 
+
+
+-- for Website color scheme: https://mycolor.space

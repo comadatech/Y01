@@ -1,16 +1,16 @@
 <?php
-    //Since this is the main page, let's ensure that there is no session started
-    if(isset($_SESSION)) {
-        session_destroy();
-        session_end();
-   }
-
-   ob_start();
+/*
+ * There should be no session work on this page
+ * todo remove all session code since it should only start on validatelogin.php
+ */
    
-   //if session is not started then start the session
-//    if(!isset($_SESSION)) {
-        session_start();
-//   }
+    session_start();
+    
+    //if no session then lets start the session
+    if(!isset($_SESSION["personid"]) or $_SESSION["personid"]<0){
+        $_SESSION["personid"] = 0;
+        $_SESSION['cart'] = array();   
+    }
 
    //include files
    require 'includes\config.php';
@@ -29,78 +29,68 @@
 
     // Include Language file
     if(isset($_SESSION['language'])){
-        include "lang_".$_SESSION['language'].".php";
+        include "includes/lang_".$_SESSION['language'].".php";
         $language = $_SESSION['language'];
     }
     else
     {
         //not set up them set to default English
-        include "lang_eng.php";
+        include "includes/lang_eng.php";
         $language = "Eng";
         $_SESSION['language'] = "Eng";
     }
+    
+    
    // error_reporting(E_ALL);
-   // ini_set("display_errors", 1);
+    ini_set("display_errors", 1);
 ?>
 
 <html lang = "en">
    <head>
-      <title>Yoga</title>
-      <link href = "css/base.css" rel = "stylesheet">
-      <link href = "css/divtable.css" rel = "stylesheet">
-      <link href = "css/form.css" rel = "stylesheet">
-      <style>
-          #login{text-align: center}
+        <title>Yoga</title>
+        <link href = "css/base.css" rel = "stylesheet">
+        <link href = "css/divtable.css" rel = "stylesheet">
+        <link href = "css/form.css" rel = "stylesheet">
+        <link href = "font-awesome/css/font-awesome.min.css" rel="stylesheet" >
+        <link href = "css/header.css" rel = "stylesheet">
+        <style>
+            #login{text-align: center}
           
-          .col-75{text-align:left}
-          .col-25{text-align:right}
-
-      </style>
+            .col-75{text-align:left}
+            .col-25{text-align:right}
+            
+            .logo {
+                font-size:106px;
+                color:green;
+                font-family: cursive;
+            }
+            
+            .saule{
+                position: absolute;
+                top: 20%;
+                left: 20%;
+                transform: translate(-20%, -20%);
+            }
+            .yoga {
+                position: absolute;
+                top: 40%;
+                left: 30%;
+                transform: translate(-40%, -30%);
+            }
+        </style>
    </head>
    <body>
-       <div id="language"><?php echo _LANGUAGE?></div>
-        <div id = "logincontainer">
-            <!--<img src="bj.jpg" style="width:10%; height:auto"/>-->
-            <h1><?php echo f_GetCompagnyName(); ?></h1> 
-            <div id = "login">
-                <h4 class = "form-signin-heading"></h4>    
-                <form class = "form-signin" role = "form" action = "<?php echo 'validatelogin.php';?>" method = "post" id="form1">
-
-                    <legend style="text-align: center"><?php echo _LOGINTITLE ?></legend>
-                    <div class="row">
-                        <div class="col-25">
-                            <label><?php echo _LABEL_USERNAME?></label>
-                        </div>
-                        <div class="col-75">
-                            <input type = "text" name = "username" title="<?php echo _LABEL_USERNAME_TT?>" required autofocus>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-25">
-                            <label><?php echo _LABEL_PASSWORD ?></label>
-                        </div>
-                        <div class="col-75">
-                            <input type = "password" name = "password"  required>
-                        </div>                  
-                    </div>
-                    <div class="row">                   
-                        <div class="col-100">
-                            <button type = "submit" name = "login" class="button button1"><?php echo _LOGIN?></button>
-                        </div>
-                    </div>
-                    <div class="row">                   
-                        <div class="col-100">
-                            <div><?php echo _FORGOTPASSWORD; ?></div>
-                        </div>
-                    </div>                     
-                    <div class="row">                   
-                        <div class="col-100">
-                            <div><?php echo _NOTREGISTERED; ?></div>
-                        </div>
-                    </div>                
-                </form>
-            </div>   
-        </div> <!-- /container -->
+        <header>
+        <?php 
+            f_DisplayHeader();
+        ?>
+        </header>
+        <?php echo f_DisplaySiteMenu(C_HOME); ?>
+        <div id='container'>
+            <img src='images/index.jpeg' style='width:100%'>
+            <div id='logo' class='logo saule'>Saule</div>
+            <div id='logo' class='logo yoga'>Yoga</div>
+        </div>
         <?php echo f_DisplayFooter($language); ?>
     </body>
 </html>

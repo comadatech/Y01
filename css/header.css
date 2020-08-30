@@ -1,0 +1,56 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Aug. 25, 2020, 2:07:12 p.m.
+    Author     : comad
+*/
+
+header{
+   height:30px; 
+   /*background-color: #4caf501c;*/ 
+   padding:10px; 
+
+   vertical-align: middle; 
+   /*border-bottom: 1px solid green;*/ 
+}
+
+#leftside{
+    color: green;
+    font-weight: 700;
+    font-family: cursive;
+    float: left;
+    font-size: 18px; 
+    height:30px; 
+    margin-top: 5px;    
+}
+
+
+.topbaritem {
+   padding:0px 20px 0px 20px;
+}
+
+.badge {
+    padding-left: 9px;
+    padding-right: 9px;
+    -webkit-border-radius: 9px;
+    -moz-border-radius: 9px;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+.label-warning[href],
+.badge-warning[href] {
+  background-color: #c67605;
+}
+
+#lblCartCount {
+    font-size: 12px;
+    background: #ff0000;
+    color: #fff;
+    padding: 0 5px;
+    vertical-align: top;
+    margin-left: -10px; 
+} 
