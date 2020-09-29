@@ -10,28 +10,43 @@
     include 'includes\library.php';
     include 'includes\constant.php';
 
-    //let's set the labguage in the session variable
-    $language = f_SetSessionLanguage();
+    /* If user click on language then change language 
+    * by calling this page again but changing the session language
+    */
+    if(isset($_GET['language']) && !empty($_GET['language'])){
+        
+        $_SESSION['language'] = $_GET['language'];
+
+        if(isset($_SESSION['language']) && $_SESSION['language'] != $_GET['language']){
+            echo "<script type='text/javascript'> location.reload(); </script>";
+        }
+    }
+   
+    f_InitSessionVariable();
+//    f_InitSessionLanguage();
     
-    //let's set the laguage library
+    $language = f_GetSessionLanguage();
+   
     f_SetLibraryLanguage($language);
     
     // Set the session activity
     f_SetSessionActivity(); 
+    
+    $personid = f_GetPersonID();
+   
   
     // Declare variables
-    $msg = "";
-    $posted = false;
-
-   // error_reporting(E_ALL);
-   // ini_set("display_errors", 1);
+    $msg            = "";
+    $posted         = false;
+    $competencyfra  = "";
+    $competencyeng  = "";
+    $biofra         = "";
+    $bioeng         = "";
+    $persontypename = f_GetPersonInfo($personid, $language, 'PersonTypeName');
+    $savesuccessfull = false;
     
-    if ($_SESSION["personid"] > 0)
-    {
-        $personid = $_SESSION['personid']; 
-    }
-    else{
-        //no personid from session? we should not go anywhere execpt go back to login page 
+    if ($personid == 0){
+        //no personid from session? we should not go anywhere exept go back to login page 
         echo '<script type="text/javascript"> window.location.href = "index.php" </script>';
     }
    
@@ -39,81 +54,59 @@
     if (isset($_POST['personid']) && !empty($_POST['personid']))
     {
         $posted = true;
-        
-
+       
         // get all posted values 
-        //$personid           = mysqli_real_escape_string($conn, $_POST['personid']);
-        //$username           = mysqli_real_escape_string($conn, $_POST['username']);
-        $email              = mysqli_real_escape_string($conn, $_POST['email']);
-        $firstname          = mysqli_real_escape_string($conn, $_POST['firstname']);
-        $lastname           = mysqli_real_escape_string($conn, $_POST['lastname']);
-        //$gender             = mysqli_real_escape_string($conn, $_POST['gender']);
-        $gender             = $_POST['gender'];
-        $addressstreet      = mysqli_real_escape_string($conn, $_POST['addressstreet']);
-        $addresscity        = mysqli_real_escape_string($conn, $_POST['addresscity']);
-        //$addressprovinceid  = mysqli_real_escape_string($conn, $_POST['addressprovinceid']);
-        $addressprovinceid  = $_POST['addressprovinceid'];
-        $addresspostalcode  = mysqli_real_escape_string($conn, $_POST['addresspostalcode']);
-        $phonenumber        = mysqli_real_escape_string($conn, $_POST['phonenumber']);
-        $dateofbirth        = mysqli_real_escape_string($conn, $_POST['dateofbirth']);
+        $competencyfra  = mysqli_real_escape_string($conn, $_POST['competencyfra']);
+        $competencyeng  = mysqli_real_escape_string($conn, $_POST['competencyeng']);
+//        $biofra         = mysqli_real_escape_string($conn, $_POST['biofra']);
+        $biofra         = $_POST['biofra'];
+//        $bioeng         = mysqli_real_escape_string($conn, $_POST['bioeng']);
+        $bioeng         = $_POST['bioeng'];
         
         //lets remove the HTML in the input, to filter out unwanted HTML
-        $email              = strip_tags($email);
-        $firstname          = strip_tags($firstname);
-        $lastname           = strip_tags($lastname);
-        //$gender             = strip_tags($gender);
-        $addressstreet      = strip_tags($addressstreet);
-        $addresscity        = strip_tags($addresscity);
-        //$addressprovinceid  = strip_tags($addressprovinceid);
-        $addresspostalcode  = strip_tags($addresspostalcode);
-        $dateofbirth        = strip_tags($dateofbirth);
+        $competencyfra  = strip_tags($competencyfra);
+        $competencyeng  = strip_tags($competencyeng);
+        $biofra         = strip_tags($biofra);
+        $bioeng         = strip_tags($bioeng);
 
         //Escape all other output with htmlspecialchars() and be mindful of the 2nd and 3rd parameters here.
-        $email              = htmlspecialchars($email);
-        $firstname          = htmlspecialchars($firstname);
-        $lastname           = htmlspecialchars($lastname);
-        //$gender             = strip_tags($gender);
-        $addressstreet      = htmlspecialchars($addressstreet);
-        $addresscity        = htmlspecialchars($addresscity);
-        //$addressprovinceid  = strip_tags($addressprovinceid);
-        $addresspostalcode  = htmlspecialchars($addresspostalcode);
-        $dateofbirth        = htmlspecialchars($dateofbirth);        
-        
+        $competencyfra  = htmlspecialchars($competencyfra);
+        $competencyeng  = htmlspecialchars($competencyeng);
+        $biofra         = htmlspecialchars($biofra);
+        $bioeng         = htmlspecialchars($bioeng);
+    
         //Must create function to validate data
-        $validemail     = f_ValidateEmail($email, $msg);
-        $validfirstname = f_ValidateFirstName($firstname, $msg);
-        $validlastname  = f_ValidateLastName($lastname, $msg);
-        // need validation of postal code
-        // need validation on Phone Number
-        // need validation on Date of Birth
-        // need validation on city, can only be letter non numeric
-         
-        if($validemail && $validfirstname && $validlastname){
-            if ($conn->connect_error) {
+        $is_competencyfra_notnull = f_ValidateNotNull(_LABEL_COMPETENCY_FR,$competencyfra, $msg);
+        $is_competencyeng_notnull = f_ValidateNotNull(_LABEL_COMPETENCY_EN,$competencyeng, $msg);
+        $is_biofra_notnull        = f_ValidateNotNull(_LABEL_BIO_FR,$biofra, $msg);
+        $is_bioeng_notnull        = f_ValidateNotNull(_LABEL_BIO_EN,$bioeng, $msg);
+
+        if($is_competencyfra_notnull && $is_competencyeng_notnull && $is_biofra_notnull && $is_bioeng_notnull){
+            
+            
+            if ($conn->connect_error) 
+            {
               die("Connection failed: " . $conn->connect_error);
-            }
+            }          
 
             // let's update the data with the post values
-            $sql = "UPDATE person SET email='".$email."'"
-                    .", firstname = '".$firstname."'"
-                    .", lastname = '".$lastname."'"
-                    .", gender = '".$gender."'"
-                    .", language = '".$language."'"
-                    .", addressstreet = '".$addressstreet."'"
-                    .", addresscity = '".$addresscity."'"
-                    .", addressprovinceid = '".$addressprovinceid."'"
-                    .", addresspostalcode = '".$addresspostalcode."'"
-                    .", phonenumber = '".$phonenumber."'"
-                    .", dateofbirth = '".$dateofbirth."'"
-                    .", modifiedbyuserid = '".$personid."'"
+            $sql = "UPDATE instructor SET CompetencyFra='".$competencyfra."'"
+                    .", CompetencyEng = '".$competencyeng."'"
+                    .", BioFra = '".$biofra."'"
+                    .", BioEng = '".$bioeng."'"
                     ." WHERE personid=".$personid;
+            
+//            echo $sql;
 
-            if ($conn->query($sql) === TRUE) {
-
+            if ($conn->query($sql) === TRUE) 
+            {
                 $msg = _MSG_SAVE_SUCCESS; 
-              //let set the language again in case it has been updated
-              $_SESSION['lang'] = $language;
-            } else {
+                //let set the language again in case it has been updated
+                $_SESSION['lang'] = $language;
+                $savesuccessfull = true;
+            } 
+            else 
+            {
               $msg = "Error updating record: " . $conn->error;
             }        
         }        
@@ -122,32 +115,160 @@
 <html lang = "en">
     <head>
         <title>Yoga</title>
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+        <meta http-equiv="Pragma" content="no-cache" />
+        <meta http-equiv="Expires" content="0" />
         <link href = "css/base.css" rel = "stylesheet">
         <link href = "css/divtable.css" rel = "stylesheet">
         <link href = "css/form.css" rel = "stylesheet">      
         <link href = "font-awesome/css/font-awesome.min.css" rel="stylesheet" >
-        <link href = "css/header.css" rel = "stylesheet">        
+        <link href = "css/header.css" rel = "stylesheet"> 
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+        <!--<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />-->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>        
         <script>
             function HideMessage(){
                 //setTimeout(function () { document.getElementById('message').style.display='none';}, 9000);
                 document.getElementById('message').style.display='none';
             }
+
+            $(document).ready(function()
+            {
+                $(document).on('change', '#file', function()
+                {
+                    var name = document.getElementById("file").files[0].name;
+                    var form_data = new FormData();
+                    var ext = name.split('.').pop().toLowerCase();
+
+                    if(jQuery.inArray(ext, ['jpg']) == -1) 
+                    {
+                        alert("Invalid Image File");
+                    }
+                    else
+                    {
+                       var oFReader = new FileReader();
+                       oFReader.readAsDataURL(document.getElementById("file").files[0]);
+
+                       var f = document.getElementById("file").files[0];
+//                       var fsize = f.size||f.fileSize;
+//
+                       //      if(fsize > 2000000)
+                       //      {
+                       //       alert("Image File Size is very big");
+                       //      }
+                       //      
+                       //      else
+                       //      {
+                       
+                        form_data.append("file", document.getElementById('file').files[0]);
+                        $.ajax(
+                        {
+                           url:"upload.php",
+                           method:"POST",
+                           data: form_data,
+                           contentType: false,
+                           cache: false,
+                           processData: false,
+                           beforeSend:function()
+                           {
+                            $('#uploaded_image').html("<label class='text-success'>Image Uploading...</label>");
+                           },   
+                           success:function(data)
+                           {
+                               $('#uploaded_image').html(data);
+                           }
+                        });
+                    }
+                });
+            });            
         </script>
+        <style>
+            /*this is needed here even if it is already in base.css, bug with firefox.*/
+            .subcontainer {
+                border-radius: 5px;
+                background-color: #fff;
+                padding: 20px;
+                text-align: left;
+                width: 800px;
+                margin-left:auto;
+                margin-right: auto;
+                /*border:1px solid #CCCCCC;*/
+                margin-bottom:30px;
+            }
+            
+           .img-thumbnail {
+                /*display: inline-block;*/
+                /*max-width: 100%;*/
+                height: auto;
+                padding: 4px;
+                /*line-height: 1.42857143;*/
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                -webkit-transition: all .2s ease-in-out;
+                -o-transition: all .2s ease-in-out;
+                /*transition: all .2s ease-in-out;*/
+            }
+            
+            .img-thumbnail{
+                height:280px;
+/*                float:left;*/
+            }
+            
+            .selectapicture{
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+            
+            .custom-file-input{
+                /*color:transparent;*/
+                padding-left:10px;
+                padding-right:10px;
+            }
+
+            .file_img{
+                width:0px;
+            }
+            
+            .subtitle::before{
+                content:'\f0a3';
+                font-family: "FontAwesome";
+                font-size:1em;
+                padding-right: 10px;
+            }       
+            
+            /*Do not move this code to base.css or other css files it will break */
+            input[type='text']:read-only{
+                background-color: #eee;
+            }
+            
+        </style>
     </head>
     <body>
         <header>
             <?php 
-            f_DisplayHeader();
+            f_DisplayTopMenu();
             ?>
         </header>
-        <div id = "container">
+        <?php echo f_DisplaySiteMenu(0, $personid); ?>
+        <div id ="container">
             <?php            
             if ($_SESSION["personid"] > 0 && !$posted)
+//            if ($_SESSION["personid"] > 0)
             {             
-                $sql = "SELECT personid, username, firstname, lastname, gender, language,".
-                        " addressstreet, addresscity, addressprovinceid, addresspostalcode, email,".
-                        " phonenumber, dateofbirth".
-                        " FROM person where personid = ".$personid;
+                $sql = "SELECT person.personid, UserName"
+                        . " ,if('".$language."'='fra',persontype.PersonTypeNameFra, persontype.PersonTypeNameEng) as PersonTypeName"
+                        . " ,instructor.CompetencyFra"
+                        . " ,instructor.CompetencyEng"
+                        . " ,BioFra"
+                        . " ,BioEng"
+                        . " ,Picture"
+                        . " FROM person "
+                        . " left join persontype"
+                        . " on person.persontypeid = persontype.persontypeid"
+                        . " left join instructor"
+                        . " on person.personid = instructor.PersonID"
+                        . " where person.personid = ".$personid;
                 $result = $conn->query($sql);
                 
                 if ($result->num_rows > 0) 
@@ -155,166 +276,110 @@
                     // output data of each row
                     while($row = $result->fetch_assoc()) 
                     {                       
-                        $username           = $row['username'];
-                        $email              = $row['email'];
-                        $firstname          = $row['firstname'];
-                        $lastname           = $row['lastname'];
-                        $gender             = $row['gender'];
-                        $addressstreet      = $row['addressstreet'];
-                        $addresscity        = $row['addresscity'];
-                        $addressprovinceid  = $row['addressprovinceid'];
-                        $addresspostalcode  = $row['addresspostalcode'];
-                        $phonenumber        = $row['phonenumber'];
-                        $dateofbirth        = $row['dateofbirth'];
-
-                        //lets set a default value for gender as radio input gives
-                        // an error when no value, no value mean field does not exist
-                        if(is_null($row['gender'])){
-                            $gender = 'M';
-                        }
-                        else{
-                            $gender = $row['gender'];
-                        }  
+                        $username           = $row['UserName'];
+                        $competencyfra      = $row['CompetencyFra'];
+                        $competencyeng      = $row['CompetencyEng'];
+                        $biofra             = $row['BioFra'];
+                        $bioeng             = $row['BioEng'];
+                        $persontypename     = $row['PersonTypeName'];
+                        $picture            = $row['Picture'];
                     }  
                 }
             }
+            if (strlen($msg) > 0){
+                if($savesuccessfull){
+                    echo f_DisplayMessage($msg, 'info');
+                }
+                else
+                {
+                    echo f_DisplayMessage($msg, 'warning');
+                }
+            } 
             ?>
-            <div id=''>          
-            <div class="topnav">
-                <a href="subscribeto.php"><?php echo _MENUCLASSES; ?></a>
-                <a href="schedule.php"><?php echo _MENUSCHEDULE; ?></a>
-                <a class="active"><?php echo _MENUPROFILE; ?></a>
-                <a href="passwordchg.php"><?php echo _MENUCHANGEPASSWORD; ?></a>
-            </div>
-            <br/>
-            <?php 
-                if (strlen($msg) > 0){
-                    echo f_DisplayMessage($msg);
-                } 
-            ?>
-            <br/>
-            <div class="container">
+            <div class='space_height_30'></div>
+            <div class="subcontainer">
+                <div class='subtitle'><?php echo _PROFILE; ?></div>
+                <form method="post" action="" enctype="multipart/form-data" id="myform">
+                    <div class="row">
+                        <div class="col-100">
+                          <!--<label for="picture"></label>-->
+                            <span id="uploaded_image">
+                                <img src="instructorspicture/instructor_<?php echo $personid; ?>.jpg?time()" id="img" class="img-thumbnail">
+                                <!--echo '<img src="'.$location.'?'.time().'" class="img-thumbnail" id="img" />';-->
+                            </span>
+                            <p class="selectapicture"><?php echo _CHANGEPICTURE_PRE; ?>  
+                                <input type="button" id="loadFileXml" value="<?php echo _HERE; ?>" onclick="document.getElementById('file').click();" class="custom-file-input" />
+                                <input type="file" id="file" name="file" class="file_img"/>    
+                                <?php 
+                                    echo _CHANGEPICTURE_POST;
+                                    echo "<p>"._WAITTOREFRESH."</p>";
+                                ?>
+                            </p>
+                            <br/>                            
+                        </div>
+<!--                        <div>
+                        </div>-->
+                    </div>                     
+                </form>
                 <form action="profile.php" method="post" id="form1">
-                <div class="row">
-                  <div class="col-25">
-                  </div>
-                  <div class="col-75">
-                      <input type="text" id="personid" name="personid" hidden value="<?php echo $personid; ?>">
-                  </div>
-                </div>                                   
-                <div class="row">
-                  <div class="col-25">
-                    <label for="username"><?php echo _LABEL_USERNAME; ?></label>
-                  </div>
-                  <div class="col-75">
-                      <input type="text" id="username" name="username" style="background-color: #CCCCCC;" readonly value="<?php echo $username; ?>">
-                  </div>
-                </div>                              
-                <div class="row">
-                  <div class="col-25">
-                    <label for="fname"><?php echo _LABEL_FIRSTNAME; ?></label>
-                  </div>
-                  <div class="col-75">
-                      <input type="text" id="fname" name="firstname" value="<?php echo $firstname; ?>"  onclick="HideMessage();">
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-25">
-                    <label for="lastname"><?php echo _LABEL_LASTNAME; ?></label>
-                  </div>
-                  <div class="col-75">
-                    <input type="text" id="lastname" name="lastname" value="<?php echo $lastname; ?>"  onclick="HideMessage();">
-                  </div>
-                </div>
-                <div class="row">
-                  <div class="col-25">
-                    <label for="dateofbirth"><?php echo _LABEL_DATEOFBIRTH; ?></label>
-                  </div>
-                  <div class="col-75">
-                    <input type="text" id="dateofbirth" name="dateofbirth" value="<?php echo $dateofbirth; ?>"  onclick="HideMessage();">
-                  </div>
-                </div>                                
-                <div class="row">
-                  <div class="col-25">
-                    <label for="gender"><?php echo _LABEL_GENDER; ?></label>
-                  </div>
-                  <div class="col-75">
-                    <label class="gender">
-                        <input type="radio" name = "gender" value="M" <?php if ($gender=='M'){echo 'checked';} ?>  onclick="HideMessage();"><?php echo _MALE; ?></br>
-                    </label>
-                    <label class="gender">
-                        <input type="radio" name = "gender" value="F" <?php if ($gender=='F'){echo 'checked';} ?>  onclick="HideMessage();"><?php echo _FEMALE; ?></br>
-                    </label>
-                    <label class="gender">
-                        <input type="radio" name = "gender" value="O" <?php if ($gender=='O'){echo 'checked';} ?>  onclick="HideMessage();"><?php echo _OTHER; ?></br>                                    
-                    </label>                                    
-                  </div>
-                </div>
-                <div class="row">
-                    <div class="col-25">
-                        <label for="language"><?php echo _LABEL_LANGUAGE; ?></label>
+                    
+                    <div class="row">
+                      <div class="col-25">
+                          <label for="personid"><?php echo _LABEL_PERSONID; ?></label>
+                      </div>
+                      <div class="col-75">
+                          <input type="text" id="personid" name="personid" readonly  value="<?php echo $personid.'-'.$persontypename; ?>">
+                      </div>
+                    </div>                                   
+<!--                    <div class="row">
+                      <div class="col-25">
+                        <label for="username"><?php echo _LABEL_USERNAME; ?></label>
+                      </div>
+                      <div class="col-75">
+                          <input type="text" id="username" name="username" readonly value="<?php echo $username; ?>">
+                      </div>
+                    </div>            -->
+                    
+                    <div class="row">
+                        <div class="col-25">
+                          <label for="competencyfra"><?php echo _LABEL_COMPETENCY_FR; ?></label>
+                        </div>
+                        <div class="col-75">
+                            <input type="text" id="competencyfra" name="competencyfra" value="<?php echo $competencyfra; ?>">
+                        </div>
+                    </div>  
+                    
+                    <div class="row">
+                        <div class="col-25">
+                            <label for="competencyeng"><?php echo _LABEL_COMPETENCY_EN; ?></label>
+                        </div>
+                        <div class="col-75">
+                              <input type="text" id="competencyeng" name="competencyeng" value="<?php echo $competencyeng; ?>">
+                        </div>
+                    </div>     
+                    <div class="row">
+                        <div class="col-25">
+                            <label for="biofra"><?php echo _LABEL_BIO_FR; ?></label>
+                        </div>
+                        <div class="col-75">
+                              <textarea id="biofra" name="biofra" rows="4" cols="50"><?php echo $biofra; ?></textarea>
+                        </div>
+                    </div>                      
+                    <div class="row">
+                        <div class="col-25">
+                            <label for="bioeng"><?php echo _LABEL_BIO_EN; ?></label>
+                        </div>
+                        <div class="col-75">
+                            <textarea id="bioeng" name="bioeng" rows="4" cols="50"><?php echo $bioeng; ?></textarea>
+                        </div>
+                    </div>                     
+                    <div class="buttonright">
+<!--                      <input type="submit" value="Submit">-->
+                      <button type = "submit" value="Submit" class="button button1"><?php echo _SAVE ?></button>
                     </div>
-                    <div class="col-75">
-                        <select id="lang" name="language" onchange="HideMessage();">
-                            <option value="Fra" <?php if ($language=='Fra'){echo 'selected';} ?>>Francais</option>
-                            <option value="Eng" <?php if ($language=='Eng'){echo 'selected';} ?>>English</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-25">
-                        <label for="phonenumber"><?php echo _LABEL_PHONENUMBER; ?></label>
-                    </div>
-                    <div class="col-75">
-                        <input type="text" id="phonenumber" name="phonenumber" value="<?php echo $phonenumber; ?>"  onclick="HideMessage();">
-                    </div>
-                </div>                                
-                <div class="row">
-                  <div class="col-25">
-                    <label for="addressstreet"><?php echo _LABEL_STREETADRESS; ?></label>
-                  </div>
-                  <div class="col-75">
-                    <input type="text" id="addressstreet" name="addressstreet" value="<?php echo $addressstreet; ?>"  onclick="HideMessage();">
-                  </div>
-                </div>      
-                <div class="row">
-                  <div class="col-25">
-                    <label for="AddressCity"><?php echo _LABEL_CITY; ?></label>
-                  </div>
-                  <div class="col-75">
-                    <input type="text" id="addresscity" name="addresscity" value="<?php echo $addresscity; ?>"  onclick="HideMessage();">
-                  </div>
-                </div>       
-                <div class="row">
-                  <div class="col-25">
-                    <label for="addressprovinceid"><?php echo _LABEL_PROVINCE; ?></label>
-                  </div>
-                  <div class="col-75">
-                      <?php echo f_GetProvinceList($addressprovinceid); ?>
-                  </div>
-                </div>    
-                <div class="row">
-                  <div class="col-25">
-                    <label for="addresspostalcode"><?php echo _LABEL_POSTALCODE; ?></label>
-                  </div>
-                  <div class="col-75">
-                    <input type="text" id="addresspostalcode" name="addresspostalcode" value="<?php echo $addresspostalcode; ?>"  onclick="HideMessage();">
-                  </div>
-                </div>            
-                <div class="row">
-                  <div class="col-25">
-                    <label for="email"><?php echo _LABEL_EMAIL; ?></label>
-                  </div>
-                  <div class="col-75">
-                    <input type="text" id="email" name="email" value="<?php echo $email; ?>"  onclick="HideMessage();">
-                  </div>
-                </div>                                
-                <div class="row">
-                    <br/>
-                  <input type="submit" value="Submit">
-                </div>
-              </form>
-            </div><!-- /container -->
+                </form>
+            </div><!-- /subcontainer -->
         </div> <!-- /container -->
+        <?php echo f_DisplayFooter($language); ?>
     </body>
 </html>

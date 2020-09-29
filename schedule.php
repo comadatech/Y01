@@ -10,71 +10,138 @@
     include 'includes\library.php';
     include 'includes\constant.php'; 
    
-    //let's set the labguage in the session variable
-    $language = f_SetSessionLanguage();
+    /* If user click on language then change language 
+    * by calling this page again but changing the session language
+    */
+    if(isset($_GET['language']) && !empty($_GET['language'])){
+        
+        $_SESSION['language'] = $_GET['language'];
+
+        if(isset($_SESSION['language']) && $_SESSION['language'] != $_GET['language']){
+            echo "<script type='text/javascript'> location.reload(); </script>";
+        }
+    }
+   
+    f_InitSessionVariable();
+//    f_InitSessionLanguage();
     
-    //let's set the laguage library
+    $language = f_GetSessionLanguage();
+   
     f_SetLibraryLanguage($language);
     
     // Set the session activity
     f_SetSessionActivity(); 
     
+    f_SetSessionActivity();
+    
+    $personid = f_GetPersonID();
+    
     // Declare variable
    $passactivitystyle = "";
    
 ?>
-
 <html lang = "en">
-   
    <head>
       <title>Yoga</title>
       <link href = "css/base.css" rel = "stylesheet">
       <link href = "css/divtable.css" rel = "stylesheet">
         <link href = "font-awesome/css/font-awesome.min.css" rel="stylesheet" >
-        <link href = "css/header.css" rel = "stylesheet">      
-      <style>
+        <link href = "css/header.css" rel = "stylesheet">     
+        <script>
+            
+            function displayhidepass(){
+                
+                var i, x, bottontext;
+                
+                x = document.getElementsByClassName("hidepass");
+                
+                if(x.length>0){ 
+                    
+                    for (i = 0; i < x.length; i++) {
+                                              
+                        if(x[i].style.visibility == "collapse")
+                        {
+                            x[i].style.visibility  = "visible";
+                            //bottontext = 'Hide pass classes';
+                            bottontext = '<?php echo _HIDEPASSCLASSES; ?>';
+                        }
+                        else
+                        {
+                            x[i].style.visibility  = "collapse"; 
+                            bottontext = '<?php echo _SHOWPASSCLASSES; ?>';
+                        }
+                        
+                        document.getElementById('hiddisplaybutton').innerHTML = bottontext;
+                    }
+                }
+            }     
+        </script>
+      
+        <style>
             /*need to overrite the width as the default is too small*/
             .divHeader, .divCell{
                 width:180px;
             } 
-      </style>
+            
+            .hidepass{
+                background-color:#fff4e3; 
+                visibility:visible;
+                height:0px;
+            }
+                    
+            .showpass{
+                background-color:#FFF; 
+                visibility:visible;
+                height:30px;
+             }      
+             .button{
+                 /*height:30px;*/
+                 padding:4px;
+                 float:left;
+                 padding-left:20px;
+                 padding-right:20px;
+             }
+             
+            .subtitle::before{
+                content:'\f29a';
+                font-family: "FontAwesome";
+                font-size:1em;
+                padding-right: 10px;
+            }
+        </style>
    </head>
-   <body>
+   <!-- must call the function on load, do not remove-->
+   <body onload="displayhidepass();">
         <header>
             <?php 
-            f_DisplayHeader();
+            f_DisplayTopMenu();
             ?>
         </header>
+        <?php echo f_DisplaySiteMenu(C_SCHEDULE, $personid); ?>
         <div id = "container">
+            <div class="space_height_30"></div>
+            <div class='subtitle'><?php echo _SCHEDULE; ?></div>
             <div id="content-wrap">
+            <div id='horaire' class='divTable'>
+                <button id='hiddisplaybutton' class='button' onclick="displayhidepass();">Show pass classes</button>
+                <div class='space_height_30'></div>
             <?php 
-            if ($_SESSION['personid'] > 0 )
+            if ($personid > 0 )
             {
-                
-                // get and set personid
-                if ($_SESSION['personid'] > 0 ) {
-                    $personID = $_SESSION['personid'];
-                }      
-                ?>
-                <div class="topnav">
-                  <a href="subscribeto.php"><?php echo _MENUCLASSES; ?></a>
-                  <a href="" class="active"><?php echo _MENUSCHEDULE; ?></a>
-                  <a href="profile.php"><?php echo _MENUPROFILE; ?></a>
-                </div>
-                </br></br>
-                <?php
-                  
+
                 // Let's display the complete scedule
                 // execute the stored procedure
-                $sql = "CALL USP_GetPersonScedule(".$personID.",'".$language."')";
+                $sql = "CALL USP_GetPersonSchedule(".$personid.",'".$language."')";
 
                 //run the store proc
                 $result = mysqli_query($conn, $sql);
+                
+               //echo date("m");
 
                 //display table header
                 echo 
-                "<div id='horaire' class='divTable'>"
-                    . "<div class='divrow'>"
+//                "<div id='horaire' class='divTable'>"
+                     "<div class='divrow'>"             
                         ."<div class='divHeader'>" 
                             . _COL_ACTIVITYNAME
                         ."</div>"
@@ -94,16 +161,16 @@
                         
                         //this is to dim the activity that it passed
                         if(date($row["Date"]) < date('Y-m-d', time())) {
-                            $passactivitystylerow = " style='background-color:#EBEBEB; ' ";
+                            $statetime = "hidepass";
                         }
                         else
                         {
-                            $passactivitystylerow = "";
+                            $statetime = "showpass";
                         }
                         
                         // table content
                         echo 
-                        "<div class='divrow' ".$passactivitystylerow.">"
+                        "<div  class='divrow ".$statetime."'>"
                             ."<div class='divcell'>" 
                                 . $row["ActivityName"]
                             ."</div>"
@@ -117,11 +184,10 @@
                                 .$row["LocationName"]
                             ."</div>"                                        
                         ."</div>";                               
-
                     }                                   
             }    
         ?>
-        </div>
+                </div>
         </div> <!-- /container -->
     </body>
     

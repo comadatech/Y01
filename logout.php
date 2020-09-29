@@ -13,8 +13,6 @@ session_start();
 //        session_destroy();
 //        session_end();
    }
-
-   echo $_SESSION['personid'];
   
   header("Location: index.php"); 
 ?>

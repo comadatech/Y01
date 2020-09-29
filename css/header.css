@@ -10,11 +10,14 @@ and open the template in the editor.
 
 header{
    height:30px; 
-   /*background-color: #4caf501c;*/ 
+   background-color: #5d5d5a;; 
    padding:10px; 
-
    vertical-align: middle; 
    /*border-bottom: 1px solid green;*/ 
+}
+
+header a{
+    color:#fff;
 }
 
 #leftside{
@@ -29,8 +32,10 @@ header{
 
 
 .topbaritem {
-   padding:0px 20px 0px 20px;
+   padding:0px 20px 0px 10px;
+   color:#fff;
 }
+
 
 .badge {
     padding-left: 9px;
@@ -54,3 +59,138 @@ header{
     vertical-align: top;
     margin-left: -10px; 
 } 
+
+.saulelogo{
+    color:green;
+    text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+    font-family: "Brush Script MT";
+    font-size:1.5rem;
+}
+
+.yogalogo{
+    color:#ffa500;
+    text-shadow: 2px 0 0 #fff, -2px 0 0 #fff, 0 2px 0 #fff, 0 -2px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+    font-family: "Brush Script MT";
+    font-size:1.5rem;
+}
+
+
+/*Menu drop down for Top Menu*/
+.dropbtn, .loginbtn {
+    cursor: pointer;
+    padding:10px;
+}
+
+.loginbtn a{
+        text-decoration: none;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropbtn::before{
+    content:'\f0c9';
+    font-family: "FontAwesome";
+    padding-right: 10px;
+    text-decoration: none !important;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  top:20px;
+  right:2%;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {background-color: #ffcdab}
+
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown:hover .dropbtn {
+  background-color: #3e8e41;
+  padding:10px;
+}
+
+.dropdown:hover .loginbtn {
+  background-color: #3e8e41;
+  padding:10px;
+}
+
+.languagemenu {
+    padding:10px; 
+    text-decoration: none;
+    font-size:.7rem;
+}
+
+.languagemenu:hover {background-color: #3e8e41}
+
+.cartmenu{padding:10px;}
+.cartmenu:hover{background-color: #3e8e41}
+
+/*Still for menu but additional setting*/
+.m_myclass::before{
+    content:'\f29a';
+    font-family: "FontAwesome";
+    padding-right: 10px;
+
+}
+
+.m_subscriptions::before{
+    content:'\f073';
+    font-family: "FontAwesome";
+    padding-right: 10px;
+}
+
+.m_account::before{
+    content:'\f007';
+    font-family: "FontAwesome";
+    padding-right:10px;
+}
+
+.m_password::before{
+    content:'\f084';
+    font-family: "FontAwesome";
+    padding-right:10px;
+}
+
+.m_logout::before{
+    content:'\f08b';
+    font-family: "FontAwesome";
+    padding-right:10px;
+}
+
+.m_signin::before{
+    content:'\f090';
+    font-family: "FontAwesome";
+    padding-right:10px;
+}
+
+.m_profile::before{
+    content:'\f0a3';
+    font-family: "FontAwesome";
+    padding-right:10px;
+}
+
+.m_social::before{
+    content:'\f0c1';
+    font-family: "FontAwesome";
+    padding-right:10px;
+}
+
+ 

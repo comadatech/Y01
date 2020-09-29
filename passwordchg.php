@@ -10,32 +10,30 @@
    include 'includes\library.php';
    include 'includes\constant.php';
    
-    //let's set the labguage in the session variable
-    $language = f_SetSessionLanguage();
-    
-    //let's set the laguage library
-    f_SetLibraryLanguage($language);   
-   
-   // set session time out
-    if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > C_TIMEOUT)) {
-        // last request was more than 15 minutes ago
-        session_unset();     // unset $_SESSION variable for the run-time 
-        session_destroy();   // destroy session data in storage
-        //go back to login
-        echo '<script type="text/javascript"> window.location.href = "index.php" </script>';
+  /* If user click on language then change language 
+   * by calling this page again but changing the session language
+   */
+    if(isset($_GET['language']) && !empty($_GET['language'])){
+        
+        $_SESSION['language'] = $_GET['language'];
+
+        if(isset($_SESSION['language']) && $_SESSION['language'] != $_GET['language']){
+            echo "<script type='text/javascript'> location.reload(); </script>";
+        }
     }
-    $_SESSION['LAST_ACTIVITY'] = time(); // update last activity time stamp   
+   
+    f_InitSessionVariable();
+//    f_InitSessionLanguage();
+    
+    $language = f_GetSessionLanguage();
+   
+    f_SetLibraryLanguage($language);  
+   
+    f_SetSessionActivity();
+    
+    $personid = f_GetPersonID();
   
     $msg = "";
-
-   // error_reporting(E_ALL);
-   // ini_set("display_errors", 1);
-    
-    // might not need the following if
-    if ($_SESSION["personid"] > 0)
-    {
-        $personid = $_SESSION['personid']; 
-    }
        
     // Page has been submitted
     if (isset($_POST['personid']) && !empty($_POST['personid']))
@@ -123,44 +121,38 @@
         }        
       </script>
       <style>
-/*        .fa{
-              padding: 6px;
-              border: 1px solid black;
-              border-radius: 4px;
-              margin-left: 10px;
-        }
-          */
         .fa.field{
                 padding: 6px;
                 border: 1px solid black;
                 border-radius: 4px;
                 margin-left: 10px;
         }
+        
+        .subtitle::before{
+            content:'\f084';
+            font-family: "FontAwesome";
+            font-size:1em;
+            padding-right: 10px;
+        }     
       </style>
-          
    </head>
    <body>
         <header>
             <?php 
-            f_DisplayHeader();
+            f_DisplayTopMenu();
             ?>
         </header>
+       <?php echo f_DisplaySiteMenu(C_PASSWORDCHG, $personid); ?>
         <div id = "container">
+            <div class='subtitle'><?php echo _PASSWORDCHANGE; ?></div>
             <div id=''>
-            <div class="topnav">
-                <a href="subscribeto.php"><?php echo _MENUCLASSES; ?></a>
-                <a href="schedule.php"><?php echo _MENUSCHEDULE; ?></a>
-                <a href="profile.php"><?php echo _MENUPROFILE; ?></a>
-                <a class="active"><?php echo _MENUCHANGEPASSWORD; ?></a>
-            </div>
-            <br/>
             <?php 
                 if (strlen($msg) > 0){
-                    echo f_DisplayMessage($msg);
+                    echo f_DisplayMessage($msg, 'warning');
                 } 
             ?>
             <br/>
-            <div class="container">
+            <div class="subcontainer">
                 <form action="passwordchg.php" method="post" id="form1">
                 <div class="row">
                   <div class="col-25">
@@ -194,9 +186,10 @@
                       <input type="password" id="retypepassword" onclick="HideMessage();" name="retypepassword"><i id="retypepasswordbutton" class="fa fa-eye field" onclick="showhide('retypepassword',this);"></i>
                   </div>
                 </div>                                   
-                <div class="row">
-                    <br/>
-                  <input type="submit" value="Submit">
+                <div class="row" style="text-align: right">
+                    <!--<br/>-->
+                  <!--<input type="submit" value="Submit" class="button button1">-->
+                  <button type = "submit" value="Submit" class="button button1"><?php echo _SAVE ?></button>
                 </div>
               </form>
             </div>

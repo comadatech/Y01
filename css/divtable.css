@@ -21,7 +21,7 @@
 {
    display:table-row;
    width:auto;
-   border:1px solid #DDDDDD;
+   border:1px solid #ffcdab;
 }
 
 .divHeader{
@@ -30,9 +30,9 @@
     padding:10px; 
 /*    width:202px;*/
     text-align:left;    
-    border-left:1px solid #DDDDDD;
+    border-left:1px solid #c67605;
     font-weight:600;
-    background-color: #e1ffe0;
+    background-color: #ffcdab;
 /*    width:40%;*/
 }
 
@@ -44,7 +44,7 @@
     padding:10px; 
     /*width:202px;*/
     text-align:left;    
-    border-left:1px solid #DDDDDD;
+    border-left:1px solid #c67605;
     /*width: 20%;*/
 }
 

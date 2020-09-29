@@ -1,0 +1,99 @@
+<html lang = "en">
+    <head>
+        <title>Grids</title>
+        <style>
+            .grid-container {
+              display: grid;
+              grid-template-columns: .5fr 1.5fr 1.5fr .5fr;
+              grid-template-rows: .2fr 1.4fr 1.4fr;
+              gap: 16px 16px;
+              grid-template-areas:
+                "leftblank title title rightblank"
+                "leftblank card1 card2 rightblank"
+                "leftblank card3 card4 rightblank";
+            }
+            
+            .card1 { 
+                grid-area: card1; 
+                border:1px solid black;
+                /*height:200px;*/
+                height:max-content;
+                height:content-box;
+                padding:10px;
+            }
+
+            .card2 { 
+                grid-area: card2;
+                border:1px solid black;
+                height:content-box;
+                padding:10px;
+            }
+            
+            .card3 { 
+                grid-area: card3; 
+                border:1px solid black;
+                height:content-box;
+                padding:10px;
+            }
+
+            .card4 { 
+                grid-area: card4; 
+                border:1px solid black;
+                height:content-box;
+                padding:10px;
+            }
+
+            .title { 
+                grid-area: title; 
+                /*display:grid;*/
+                font-size: 1.5rem;
+                font-weight: 800px;
+                margin-bottom: 5px;
+                color:#000;
+                /*height:30px;*/
+            }
+            
+            .cardtitle { 
+                grid-area: title; 
+                /*display:grid;*/
+                font-size: 1.5rem;
+                font-weight: 800px;
+                margin-bottom: 5px;
+                color:red;
+                margin-top:10px;
+                /*height:30px;*/
+            }
+
+            .leftblank { grid-area: leftblank; }
+
+            .rightblank { grid-area: rightblank; }
+
+            .image{
+                display: block;
+                height: 140px;
+                float:left;
+                border:1px solid #7b6c74;
+                margin-right:20px;
+            }
+        </style>
+    </head>
+    <body>       
+        <div class="grid-container">
+            <p class="title">Ceci est le page title</p>
+            <div class="card1">
+                <p class='cardtitle'>Ceci est le sous titre est il peut etre long</p>
+                <img src="images/y10.jpeg" class='image'>
+                <p class='description'>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+                <p>Pour plus d'information cliquez-ici</p>
+            </div>
+          <div class="card2"></div>
+          <div class="title"></div>
+          <div class="leftblank"></div>
+          <div class="rightblank"></div>
+          <div class="card3"></div>
+          <div class="card4"></div>
+        </div>
+    </body>
+</html>

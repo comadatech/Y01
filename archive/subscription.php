@@ -14,7 +14,7 @@
     include 'includes\constant.php';
 
     //let's set the labguage in the session variable
-    $language = f_SetSessionLanguage();
+    $language = f_InitSessionLanguage();
     
     //let's set the laguage library
     f_SetLibraryLanguage($language);
@@ -55,11 +55,11 @@
                         echo "<h2>"._SUBSCRIPTION."</h2>";
                         ?>
                         <div class="topnav">
-                          <a class="active" href="#home"><?php echo _MENUSUBSCRIBTION; ?></a>
+                          <a class="active" href="#home"><?php echo _MENU_SUBSCRIPTION; ?></a>
                           <a href="subscribeto.php"><?php echo _MENUSUBSCRIBETO; ?></a>
-                          <a href="schedule.php"><?php echo _MENUSCHEDULE; ?></a>
-                          <a href="profile.php"><?php echo _MENUPROFILE; ?></a>
-                          <a href="index.php"><?php echo _MENULOGOUT; ?></a>
+                          <a href="schedule.php"><?php echo _MENU_SCHEDULE; ?></a>
+                          <a href="myaccount.php"><?php echo _MENU_ACCOUNT; ?></a>
+                          <a href="index.php"><?php echo _MENU_LOGOUT; ?></a>
                         </div>
 
                         <?php
@@ -68,7 +68,7 @@
 
 
                     // execute the stored procedure
-                    $sql = "CALL USP_GetUserSubscription(".$personid.",'".$language."')";
+                    $sql = "CALL USP_GetPersonSubscription(".$personid.",'".$language."')";
 
                     //run the store proc
                     $result = mysqli_query($conn, $sql);                        

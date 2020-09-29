@@ -1,0 +1,61 @@
+TODO:
+
+X mean done.
+- mean not done
+
+- Authenticate using facebook...
+X - Implementing Captcha in registration
+- Send a confirmation email
+- Add account confirmation page from email.
+- Add more validation on registration and in profile.
+- Create a message box with style and icon and color using ajax.
+- Ensure that everywhere there are no SQL Injection
+- Investigate if need to add salt in password hash
+- send to an error page when $conn is in error. Instead or a message and a DIE.
+X - Rename page index.php to login.php
+X if person already login, cannot register again
+- delete page suscribeto.php it is now classes.php
+X Make schedule collapsible for pass classes 
+X - If the user is already logged in, the loggin page should not display the login form and display 
+        a message that he/she need to logout before login in.
+X - In schedule collapse pass classes.
+- in schedule let the user filter on classes, ex. a link per class should only show the selected class.
+- add in activityschedule maxstudentallow, so we do not surpass the number allow of student in a class.
+- student should 
+
+- Create menu for admin
+    - Create business page in admin for taxes, business name, phone, email, and contact info.  
+    - social media links, facebook, twitter, youtube, Instagram
+    - should also be able show/hide in top menu (business phone number, business email)
+    - To create instructor
+    - To create discount/coupon
+    - Subscription for the day or list of new subscription
+    - Amount due report
+    - Total subscription per month and $$$
+    - Modify person account 
+
+- Create menu for Instructors
+    X My Classes, Date, Time, Location, student name and link to student info.
+    X In My Classes, should be able to colored differently old pass classes, on going classes and future classes
+    - From My Classes should be able to click on student name and see detail of the student.
+    - Student detail should include the student address + all payments made + payments due + all subscriptions... 
+
+--------------------------------------------------------------------------------------------------------------
+References:
+
+-- for Website color scheme: https://mycolor.space
+-- for css compatibility www.caniuse.com
+-- for free images https://www.pexels.com
+-- for icon using font https://fontawesome.com/v4.7.0/
+-- for css tips and tricks kevin powell from https://www.kevinpowell.co
+-- for css combinators https://www.w3schools.com/css/css_combinators.asp
+--------------------------------------------------------------------------------------------------------------
+
+To fix MySQL when corrupted:
+
+1.Rename the folder mysql/data to mysql/data_old (you can use any name)
+2.Create a new folder mysql/data
+3.Copy the content that resides in mysql/backup to the new mysql/data folder
+4.Copy all your database folders that are in mysql/data_old to mysql/data
+5.Finally copy the ibdata1 file from mysql/data_old and replace it inside mysql/data folder
+6.Start MySQL from XAMPP control panel

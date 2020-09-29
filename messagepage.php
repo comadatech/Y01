@@ -1,9 +1,4 @@
 <?php
-/* 
- * This is a generic page to display messages.
- * 
- * 
- */
 
    //if session is not started then start the session
     if(!isset($_SESSION)) {
@@ -15,10 +10,23 @@
     include 'includes\library.php';
     include 'includes\constant.php'; 
    
-    //let's set the labguage in the session variable
-    $language = f_SetSessionLanguage();
+    /* If user click on language then change language 
+    * by calling this page again but changing the session language
+    */
+    if(isset($_GET['language']) && !empty($_GET['language'])){
+        
+        $_SESSION['language'] = $_GET['language'];
+
+        if(isset($_SESSION['language']) && $_SESSION['language'] != $_GET['language']){
+            echo "<script type='text/javascript'> location.reload(); </script>";
+        }
+    }
+   
+    f_InitSessionVariable();
+//    f_InitSessionLanguage();
     
-    //let's set the laguage library
+    $language = f_GetSessionLanguage();
+   
     f_SetLibraryLanguage($language);
     
     // Set the session activity
@@ -34,18 +42,10 @@
       <link href = "css/base.css" rel = "stylesheet">
       <link href = "css/divtable.css" rel = "stylesheet">
       <link href = "css/form.css" rel = "stylesheet">
-      <style>
-          #login{text-align: center}
-          
-          .col-75{text-align:left}
-          .col-25{text-align:right}
-
-      </style>
    </head>
    <body>
       
         <div id = "container">
-        <h1><?php echo f_GetCompagnyName(); ?></h1>
          <div id="message"><?php echo $msg; ?></div>
         </div>
       

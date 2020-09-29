@@ -25,7 +25,7 @@
     }
 
     //let's set the language in the session variable
-    $language = f_SetSessionLanguage();
+    $language = f_InitSessionLanguage();
     
     $css                = "";
     $note               = "";
@@ -38,10 +38,34 @@
     $Location           = "";
     $RowNumber          = 0;
     $IsInCart           = false;
-    $disabled            = '';
+    $disabled           = '';
+    
+    // Set Language variable
+    if(isset($_GET['language']) && !empty($_GET['language'])){
+        
+        $_SESSION['language'] = $_GET['language'];
+
+        if(isset($_SESSION['language']) && $_SESSION['language'] != $_GET['language']){
+            echo "<script type='text/javascript'> location.reload(); </script>";
+        }
+    }
+
+    // Include Language file
+    if(isset($_SESSION['language'])){
+        include "includes/lang_".$_SESSION['language'].".php";
+        $language = $_SESSION['language'];
+    }
+    else
+    {
+        //not set up them set to default English
+        include "includes/lang_eng.php";
+        $language = "eng";
+        $_SESSION['language'] = "eng";
+    }
+
 
     //let's set the laguage library
-    f_SetLibraryLanguage($language);
+//    f_SetLibraryLanguage($language);
     
     // Set the session activity
     f_SetSessionActivity(); 
@@ -85,7 +109,7 @@
    <body>
         <header>
             <?php 
-            f_DisplayHeader();
+            f_DisplayTopMenu();
             ?>
         </header>
         <div id = "container">
@@ -111,9 +135,9 @@
                         ?>
                         <div class="topnav">
                          
-                          <a class="active"><?php echo _MENUCLASSES; ?></a>
-                          <a href="schedule.php"><?php echo _MENUSCHEDULE; ?></a>
-                          <a href="profile.php"><?php echo _MENUPROFILE; ?></a>
+                          <a class="active"><?php echo _MENU_CLASSES; ?></a>
+                          <a href="schedule.php"><?php echo _MENU_SCHEDULE; ?></a>
+                          <a href="myaccount.php"><?php echo _MENU_ACCOINT; ?></a>
                         </div>
 
                         <?php
@@ -136,7 +160,6 @@
                 //display table header
                 echo "<div id='horaire' class='divTable'>";
 
-
                 // output data of each row
                 while ($row = mysqli_fetch_array($result)){ 
 
@@ -151,20 +174,22 @@
                     $image              = $row["image"];
                     $RowNumber ++;
                     
+                    // Is is alreay in the cart?
                     $IsInCart =  f_IsInCart($activityscheduleid);
                     
                     if($IsInCart==true){
-                        $disabled = 'disabled style="color:red"';
-                        
+                        $disabled = 'disabled style="border:none; padding:14px;" class="fa fa-check"';
+                        $registerbuttontext = '';
                     }
                     else
-                    { $disabled = '';}
-                    
-//                    echo  $disabled;
-
-                    if($ActivityPrice > 0){
-                        $detail = "<div style='text-align:right;'><span style='font-size:20px; color:green; font-weight:900'> $".$ActivityPrice."</span>";
+                    { 
+                        $disabled = '';
+                        $registerbuttontext = _REGISTER;
                     }
+
+                    // displaying the activity price
+                    $detail = "<div style='text-align:right;'><span style='font-size:20px; color:green; font-weight:900'> $".$ActivityPrice."</span>";
+
 
                     if($TotalPaidAmount>0){
                         $detail .= "<br/><br/><b>Total Paid:</b> $".$TotalPaidAmount;
@@ -172,13 +197,17 @@
 
                     if($ActivityPrice <> $TotalPaidAmount && $AlreadyRegistered=='Y'){
                         $AmountDue = $ActivityPrice - $TotalPaidAmount;
-                        $detail .= "<br/><span style='color:red'>Total Due: $".$AmountDue."</span>";
+                        $detail .= "<br/><span style='color:red'>Total Due: $".$AmountDue."</span></div>";
                     }
                     else
                     {
-                        $detail .="<form role='form' action='payments.php' method='post' id='form1'>";
+                        $detail .="<form role='form' action='cart.php' method='post' id='form1'>";
                         $detail .="<input type='hidden' name='selectedactivity' value='".$activityscheduleid."'></input>";
-                        $detail .="<button type='submit' name='subscribe' ".$disabled." class='button button1' style='padding: 10px 32px; margin-left: 30px;'>"._REGISTER."</button>";
+                        
+                        if($AlreadyRegistered=='Y'){
+                            $detail .="<button type='submit' name='subscribe' ".$disabled." class='button button1' style='padding: 10px 32px; margin-left: 30px;'>".$registerbuttontext."</button>";
+                        }
+                        
                         $detail .="</div></form>";
                     }
                     
@@ -199,6 +228,7 @@
                         $css = "style=''";
                         f_ConcatMessage($note,"", $separator = '');
                     }
+                    
                     echo 
                     "<br/><div class='divrow' ".$css.">"
                         ."<div class='divcell'>" 

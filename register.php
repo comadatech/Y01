@@ -25,7 +25,9 @@
     $lastname           = "";
     $email              = "";
 
-    // Set Language variable
+  /* If user click on language then change language 
+   * by calling this page again but changing the session language
+   */
     if(isset($_GET['language']) && !empty($_GET['language'])){
         
         $_SESSION['language'] = $_GET['language'];
@@ -34,19 +36,17 @@
             echo "<script type='text/javascript'> location.reload(); </script>";
         }
     }
-
-    // Include Language file
-    if(isset($_SESSION['language'])){
-        include "includes/lang_".$_SESSION['language'].".php";
-        $language = $_SESSION['language'];
-    }
-    else
-    {
-        //not set up them set to default English
-        include "includes/lang_eng.php";
-        $language = "eng";
-        $_SESSION['language'] = "eng";
-    }
+   
+    f_InitSessionVariable();
+//    f_InitSessionLanguage();
+    
+    $language = f_GetSessionLanguage();
+   
+    f_SetLibraryLanguage($language);
+    
+    f_SetSessionActivity();
+    
+    $personid = f_GetPersonID();
 
     //lets get the data and validate the new registration
     if (isset($_POST['username']) && !empty($_POST['username']) && !empty($_POST['password']))
@@ -153,7 +153,8 @@
                     // Must send email with confirmation number
                     //$msg = wordwrap($msg,70);
                     echo '<script type="text/javascript"> window.location.href = "registrationcompleted.php" </script>';
-//                    mail("root@localhost.com","Registration confirmation",$msg);
+                    mail("serge@comada.ca","Registration confirmation",$msg);
+//                    mail("root@localhost.com","My subject",$msg);
                     
                 } else{
                     $msg = "ERROR: Could not able to execute $sql. " . mysqli_error($conn);
@@ -174,7 +175,6 @@
         <link href = "font-awesome/css/font-awesome.min.css" rel="stylesheet">
         <link href = "css/header.css" rel = "stylesheet">
         <style>
-            #login{text-align: center}
 
             .col-75{text-align:left}
             .col-25{text-align:right}
@@ -198,17 +198,8 @@
                 margin-left: 20%;
                 margin-right: 20%;
             }
+                
             
-            #logincontainer{
-                text-align: center;
-                border: 4px solid green;
-                padding: 10px;
-                border-radius: 22px;
-                width: 800px;
-                margin-left:auto;
-                margin-right: auto;   
-                margin-top:30px;
-            }
         </style>
         <script src="https://www.google.com/recaptcha/api.js?render=<?php echo C_SITE_KEY; ?>"></script>
         <script>
@@ -262,18 +253,26 @@
    <body>
         <header>
         <?php 
-            f_DisplayHeader();
+            f_DisplayTopMenu();
         ?>
         </header>
-       <?php echo f_DisplaySiteMenu(C_REGISTER); ?>
-        <div id = "logincontainer">
-            <div id = "login">
-                <!--<h4 class = "form-signin-heading"></h4>-->
+       <?php echo f_DisplaySiteMenu(C_REGISTER,$personid); ?>
+        <div id="container">
+            <div class='space_height_30'></div>
+            <div id ="subcontainer">
+                <?php
+                if($personid==0)
+                {
+                ?>
                 <form action="" method="POST">
-                    <h2 style="text-align: center"><?php echo _REGISTERTITLE ?></h2>
+                    <div class="subtitle"><?php echo _REGISTERTITLE ?></div>
                     <div><?php echo _MSG_REGCONFIRMATION; ?></div>
                     <?php 
-                    echo $msg;
+
+                    if (strlen($msg) > 0){
+                        echo f_DisplayMessage($msg, 'warning');
+                    }                  
+                    
                     $title      = _TIPS;
                     $helptext   = _MSG_PASSWORDREQUIREMENTS;
 
@@ -321,7 +320,6 @@
                       <div class="col-75">
                           <input type="password" id="retypepassword"  name="retypepassword" title="<?php echo _TLABEL_RETYPEPASSWORD; ?>" required>
                           <i id="retypepasswordbutton" class="fa fa-eye field" onclick="showhide('retypepassword',this);" title="<?php echo _TLABEL_SHOWRETYPEPASSWORD; ?>"></i>
-                         
                       </div>
                     </div> 
                     <div class="row">
@@ -353,7 +351,13 @@
                         });
                     });
                 </script>
-                
+                <?php 
+                }
+                else
+                {
+                    echo "<div class='message info'>"._MSG_ALREADYLOGGEDIN."</div>";
+                }
+                ?>
             </div>   
         </div> <!-- container -->
         <?php echo f_DisplayFooter($language); ?>

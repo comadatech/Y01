@@ -1,0 +1,12 @@
+1. Delete file subscribeto.php
+2. Delete file todo.txt, it is now in Documentation
+3. Get latest on all files and folders
+3. Execute database script "Script_august_31_2020.sql"
+4. Clear browser CACHE
+5. Create new folder "instructorspicture" and get all pictures
+6. Delete file subscription.php
+7. paiments.php est maintenant cart.php. Donc tu peux deleter paiments.php
+
+note: J'ai créé une page "PageTemplate.php" dans le dossier Documentation, pour comprendre la logic des pages du site.
+
+

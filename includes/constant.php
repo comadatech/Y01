@@ -15,10 +15,10 @@ define("C_SECRET_KEY","6LfZrbwZAAAAAI0UxtXLg2NFeKKNYVytMaGTZjfS");
 define("C_COMPAGNYNAME","Saule Yoga");
 
 //session time out
-define("C_TIMEOUT",300000);
+define("C_TIMEOUT",30000);
 
 // default language
-define("C_DEFAULTLANGUAGE","Fra");
+define("C_DEFAULTLANGUAGE","fra");
 
 //for password change
 define("C_MINPASSWORDLENGHT",8);
@@ -31,10 +31,17 @@ define("C_PERSONTYPE_TEACHER",2);//'Teacher'
 define("C_PERSONTYPE_CUSTOMER",3); //'Student/Customer'
 
 // Menu constant
+define("C_NONE",0);
 define("C_HOME",1);
 define("C_REGISTER",2);
 define("C_CONTACT",3);
 define("C_CLASSES",4);
 define("C_INSTRUCTOR",5);
 define("C_TOTO",6);
+define("C_SCHEDULE",7);
+define("C_ACCOUNT",8);
+define("C_PASSWORDCHG",9);
+define("C_INSTRUCTORCLASSES",10);
 
+/*Instructors Picture Path*/
+define("C_INSTRUCTORSPICTUREPATH",'instructorspicture/');
